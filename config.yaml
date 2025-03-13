@@ -100,10 +100,10 @@ CHAT_GPT:
 
 GEMINI:
     # list of api keys for Google Gemini API. Bot will use random API key for every message.
-    API_KEYS: ["AIzaSyAyLzjbDrvtGFpzKgTh7vCDi9XO6qHeCv4"]
+    API_KEYS: [""]
     # Gemini model to use. Available models: gemini-2.0-flash, gemini-2.0-pro, etc.
     MODEL: "gemini-2.0-flash"
 
     # In some countries you may need to use proxy to access Gemini API.
     # By default it's empty. Format: username:password@ip:port
-    PROXY_FOR_GEMINI: "fdvydhus:2zvx0gxnew0q@172.102.222.227:6238"
+    PROXY_FOR_GEMINI: ""
