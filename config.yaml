@@ -10,6 +10,10 @@ SETTINGS:
     # number of retries for ANY action
     ATTEMPTS: 5
 
+    # If true, bot will process only the first account in the list and run it in an infinite loop
+    # This is useful when you have only one account and want the bot to work continuously with it
+    USE_SINGLE_ACCOUNT: true
+
     # shuffle accounts in random order
     SHUFFLE_ACCOUNTS: true
 
@@ -44,10 +48,10 @@ SETTINGS:
 
 AI_CHATTER:
     # discord server id where bot will send messages
-    GUILD_ID: "1002178850156978246"
+    GUILD_ID: "1177250613344612443"
 
     # discord channel id where bot will send messages
-    CHANNEL_ID: "1093483556552061009"
+    CHANNEL_ID: "1177659428229619753"
 
     # if a bot is asked something, what is the probability that it will answer or ignore the question
     ANSWER_PERCENTAGE: 50
@@ -59,7 +63,7 @@ AI_CHATTER:
     REPLY_PERCENTAGE: 50
 
     # number of messages to send
-    MESSAGES_TO_SEND_PER_ACCOUNT: [3, 5]
+    MESSAGES_TO_SEND_PER_ACCOUNT: [1, 2]
 
     # pause between messages
     PAUSE_BETWEEN_MESSAGES: [20, 30]

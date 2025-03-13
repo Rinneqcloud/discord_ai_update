@@ -21,6 +21,7 @@ class SettingsConfig:
     RANDOM_PAUSE_BETWEEN_ACTIONS: Tuple[int, int]
     RANDOM_INITIALIZATION_PAUSE: Tuple[int, int]
     RANDOM_PROFILE_PICTURES: bool
+    USE_SINGLE_ACCOUNT: bool
 
     TASK: str
     DATA_FOR_TASKS: DataForTasks
@@ -93,6 +94,7 @@ class Config:
                     data["SETTINGS"]["RANDOM_INITIALIZATION_PAUSE"]
                 ),
                 RANDOM_PROFILE_PICTURES=data["SETTINGS"]["RANDOM_PROFILE_PICTURES"],
+                USE_SINGLE_ACCOUNT=data["SETTINGS"]["USE_SINGLE_ACCOUNT"],
                 TASK="",
                 DATA_FOR_TASKS=None,
             ),

@@ -87,6 +87,11 @@ async def start():
     else:
         shuffled_accounts = accounts_to_process
 
+    # If using single account mode, use only the first account
+    if config.SETTINGS.USE_SINGLE_ACCOUNT and shuffled_accounts:
+        shuffled_accounts = [shuffled_accounts[0]]
+        logger.info(f"Using single account mode, only processing account {shuffled_accounts[0].index}")
+
     # Создаем строку с порядком аккаунтов
     account_order = " ".join(str(acc.index) for acc in shuffled_accounts)
     logger.info(
@@ -96,13 +101,34 @@ async def start():
     logger.info(f"Accounts order: {account_order}")
 
     semaphore = asyncio.Semaphore(value=threads)
-    tasks = []
-
-    # Создаем задачи для каждого аккаунта
-    for account in shuffled_accounts:
-        tasks.append(asyncio.create_task(launch_wrapper(account)))
-
-    await asyncio.gather(*tasks)
+    
+    # Если включен режим одного аккаунта, запускаем его в бесконечном цикле
+    if config.SETTINGS.USE_SINGLE_ACCOUNT and shuffled_accounts:
+        logger.info(f"Starting infinite loop for single account mode with account {shuffled_accounts[0].index}")
+        single_account = shuffled_accounts[0]
+        while True:
+            try:
+                await launch_wrapper(single_account)
+                # Делаем небольшую паузу перед следующим циклом
+                pause = random.randint(
+                    config.SETTINGS.RANDOM_PAUSE_BETWEEN_ACCOUNTS[0],
+                    config.SETTINGS.RANDOM_PAUSE_BETWEEN_ACCOUNTS[1],
+                )
+                logger.info(f"Single account cycle completed. Pausing for {pause} seconds before next cycle...")
+                await asyncio.sleep(pause)
+            except asyncio.CancelledError:
+                logger.info("Task cancelled, stopping single account loop")
+                break
+            except Exception as e:
+                logger.error(f"Error in single account loop: {e}")
+                # Делаем паузу перед повторной попыткой в случае ошибки
+                await asyncio.sleep(5)
+    else:
+        # Обычный режим для нескольких аккаунтов
+        tasks = []
+        for account in shuffled_accounts:
+            tasks.append(asyncio.create_task(launch_wrapper(account)))
+        await asyncio.gather(*tasks)
 
 
 async def account_flow(account: Account, config: src.utils.config.Config):
@@ -120,12 +146,16 @@ async def account_flow(account: Account, config: src.utils.config.Config):
 
         await wrapper(instance.flow, config)
 
-        pause = random.randint(
-            config.SETTINGS.RANDOM_PAUSE_BETWEEN_ACCOUNTS[0],
-            config.SETTINGS.RANDOM_PAUSE_BETWEEN_ACCOUNTS[1],
-        )
-        logger.info(f"Sleeping for {pause} seconds before next account...")
-        await asyncio.sleep(pause)
+        # Skip pause if we're using a single account
+        if not config.SETTINGS.USE_SINGLE_ACCOUNT:
+            pause = random.randint(
+                config.SETTINGS.RANDOM_PAUSE_BETWEEN_ACCOUNTS[0],
+                config.SETTINGS.RANDOM_PAUSE_BETWEEN_ACCOUNTS[1],
+            )
+            logger.info(f"Sleeping for {pause} seconds before next account...")
+            await asyncio.sleep(pause)
+        else:
+            logger.info("Using single account mode, not waiting for next account.")
 
     except Exception as err:
         logger.error(f"{account.index} | Account flow failed: {err}")
